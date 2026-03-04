@@ -161,11 +161,6 @@ function renderResourceCard(resource, currentReservation, suggestion, action) {
   if (resource.status === "offline") uiStatus = "offline";
   if (currentReservation) uiStatus = "occupied";
 
-  const alerts = resource.health?.alerts || [];
-  const alertList = alerts.length
-    ? `<ul>${alerts.map((x) => `<li>${x}</li>`).join("")}</ul>`
-    : "<span class=\"muted\">No alerts</span>";
-
   const owner = currentReservation?.owner || resource.default_owner || "-";
   const until = currentReservation ? formatLocal(currentReservation.end_utc) : "-";
   const currentIssue = currentReservation?.issue_number ? `#${currentReservation.issue_number}` : "-";
@@ -183,12 +178,8 @@ function renderResourceCard(resource, currentReservation, suggestion, action) {
     <div class="meta">Current booking issue: <strong>${currentIssue}</strong></div>
     <div class="meta">Suggested start (UTC): <code>${suggestion.startUtc}</code></div>
     <div class="meta">Suggested end (UTC): <code>${suggestion.endUtc}</code></div>
-    <div>CPU ${resource.health.cpu_pct}% | RAM ${resource.health.memory_pct}% | GPU ${resource.health.gpu_pct}%</div>
-    <div>Alerts: ${alertList}</div>
     <div class="meta">SSH: <code>${resource.access.ssh}</code></div>
     <div class="meta">VPN: <a href="${resource.access.vpn_doc}" target="_blank" rel="noreferrer">documentation</a></div>
-    <div class="meta">Slurm: <code>${resource.access.slurm}</code></div>
-    <div class="meta">${resource.access.notes}</div>
     <div><a class="button ${action.className}" href="${action.href}" target="_blank" rel="noreferrer">${action.label}</a></div>
   `;
 
