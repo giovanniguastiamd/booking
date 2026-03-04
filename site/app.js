@@ -14,13 +14,19 @@ function detectRepoSlug() {
   return "";
 }
 
-function issueCreateUrl(repoSlug) {
+function detectGitHost() {
+  const explicit = document.body.dataset.gitHost;
+  if (explicit) return explicit.replace(/\/+$/, "");
+  return "https://github.com";
+}
+
+function issueCreateUrl(gitHost, repoSlug) {
   if (!repoSlug) return "#";
   const params = new URLSearchParams({
     template: "booking.yml",
     labels: "booking,status:pending"
   });
-  return `https://github.com/${repoSlug}/issues/new?${params.toString()}`;
+  return `${gitHost}/${repoSlug}/issues/new?${params.toString()}`;
 }
 
 function parseDate(value) {
@@ -146,7 +152,7 @@ async function loadDashboard() {
   document.getElementById("last-updated").textContent = `Aggiornamento dati: ${formatUtc(updated)}`;
 
   const link = document.getElementById("new-booking-link");
-  link.href = issueCreateUrl(detectRepoSlug());
+  link.href = issueCreateUrl(detectGitHost(), detectRepoSlug());
 }
 
 loadDashboard().catch((error) => {

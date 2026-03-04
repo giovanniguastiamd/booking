@@ -28,7 +28,9 @@ Questo repository implementa un sistema semplice per:
    - `status:done`
    - `resource:server-a`, `resource:cluster-x`, ecc.
 2. Aggiorna `data/resources.json` con le tue risorse reali.
-3. In `site/index.html`, imposta `data-repo="owner/repo"` sul `body` se vuoi link issue espliciti.
+3. In `site/index.html`, imposta sul `body`:
+   - `data-repo="owner/repo"`
+   - `data-git-host="https://<tuo-github-enterprise-host>"` (opzionale, default `https://github.com`)
 4. Abilita GitHub Pages:
    - `Settings -> Pages -> Build and deployment -> Source: GitHub Actions`
 5. Verifica permessi `GITHUB_TOKEN` (default va bene se non bloccato da policy org):
