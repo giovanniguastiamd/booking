@@ -71,16 +71,18 @@ function issueCreateUrl(gitHost, repoSlug, prefill = {}) {
   const startUtc = prefill.startUtc || toUtcNoSeconds(new Date());
   const endUtc = prefill.endUtc || toUtcNoSeconds(addHours(parseDate(startUtc) || new Date(), 24));
   const resourceId = prefill.resourceId || "<resource-id>";
+  const startUtcCompact = formatUtcCompact(startUtc);
+  const endUtcCompact = formatUtcCompact(endUtc);
 
   const body = [
     "Resource ID",
     resourceId,
     "",
     "Start (UTC)",
-    startUtc,
+    startUtcCompact,
     "",
     "End (UTC)",
-    endUtc,
+    endUtcCompact,
     "",
     "Reason",
     "Briefly describe what you need to run.",

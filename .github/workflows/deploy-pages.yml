@@ -71,6 +71,24 @@ jobs:
               return (blockMatch?.[1] || "").trim();
             };
 
+            const parseTime = (value) => {
+              const raw = (value || "").trim();
+              if (!raw) return null;
+
+              // Accept "YYYY-MM-DD HH:MM" or ISO-like input and treat it as UTC.
+              const compact = raw.match(/^(\d{4})-(\d{2})-(\d{2})[ T](\d{2}):(\d{2})(?:Z)?$/);
+              if (compact) {
+                const [, y, m, d, hh, mm] = compact;
+                const date = new Date(`${y}-${m}-${d}T${hh}:${mm}:00Z`);
+                return Number.isNaN(date.getTime()) ? null : date;
+              }
+
+              const date = new Date(raw);
+              if (Number.isNaN(date.getTime())) return null;
+              return date;
+            };
+
+            const toUtcNoSeconds = (date) => (date ? `${date.toISOString().slice(0, 16)}Z` : null);
             const statusPriority = ["status:active", "status:approved", "status:pending", "status:denied", "status:done"];
             const pickStatus = (labels) => statusPriority.find((status) => labels.includes(status)) || "status:pending";
 
@@ -79,13 +97,17 @@ jobs:
               .map((issue) => {
                 const labels = issue.labels.map((label) => label.name || label);
                 const resourceFromLabel = labels.find((name) => name.startsWith("resource:"))?.slice("resource:".length) || "";
+                const startRaw = extractField(issue.body || "", "Start (UTC)");
+                const endRaw = extractField(issue.body || "", "End (UTC)");
+                const start = parseTime(startRaw);
+                const end = parseTime(endRaw);
                 return {
                   issue_number: issue.number,
                   issue_url: issue.html_url,
                   title: issue.title,
                   resource_id: extractField(issue.body || "", "Resource ID") || resourceFromLabel || null,
-                  start_utc: extractField(issue.body || "", "Start (UTC)") || null,
-                  end_utc: extractField(issue.body || "", "End (UTC)") || null,
+                  start_utc: toUtcNoSeconds(start),
+                  end_utc: toUtcNoSeconds(end),
                   reason: extractField(issue.body || "", "Reason") || null,
                   owner: extractField(issue.body || "", "Contact") || issue.user?.login || null,
                   status: pickStatus(labels),
@@ -94,9 +116,9 @@ jobs:
                 };
               })
               .sort((a, b) => {
-                const d1 = Date.parse(a.start_utc || "");
-                const d2 = Date.parse(b.start_utc || "");
-                return (Number.isNaN(d1) ? 0 : d1) - (Number.isNaN(d2) ? 0 : d2);
+                const d1 = parseTime(a.start_utc)?.getTime() || 0;
+                const d2 = parseTime(b.start_utc)?.getTime() || 0;
+                return d1 - d2;
               });
 
             const payload = {

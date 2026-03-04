@@ -5,16 +5,16 @@ title: "Booking <resource-id>"
 labels: booking,status:pending
 ---
 
-Please fill in the fields below. Use UTC format `YYYY-MM-DDTHH:MMZ`.
+Please fill in the fields below. Use UTC format `YYYY-MM-DD HH:MM`.
 
 Resource ID
 <resource-id>
 
 Start (UTC)
-YYYY-MM-DDTHH:MMZ
+YYYY-MM-DD HH:MM
 
 End (UTC)
-YYYY-MM-DDTHH:MMZ
+YYYY-MM-DD HH:MM
 
 Reason
 Briefly describe what you need to run.
