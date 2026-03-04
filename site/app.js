@@ -1,5 +1,6 @@
 const ACTIVE_STATUSES = new Set(["status:approved", "status:active"]);
-const DISPLAY_STATUSES = new Set(["status:approved", "status:active", "status:pending"]);
+const BUSY_STATUSES = new Set(["status:pending", "status:approved", "status:active"]);
+const DISPLAY_STATUSES = new Set(["status:pending", "status:approved", "status:active"]);
 
 function detectRepoSlug() {
   const explicit = document.body.dataset.repo;
@@ -20,53 +21,75 @@ function detectGitHost() {
   return "https://github.com";
 }
 
-function issueCreateUrl(gitHost, repoSlug, prefill = {}) {
-  if (!repoSlug) return "#";
-  const params = new URLSearchParams({
-    labels: "booking,status:pending"
-  });
-
-  if (prefill.resourceId) {
-    params.set("title", `[BOOKING] ${prefill.resourceId} <start-end>`);
-    params.set(
-      "body",
-      [
-        "### Resource ID",
-        prefill.resourceId,
-        "",
-        "### Start (UTC)",
-        "YYYY-MM-DDTHH:MM:SSZ",
-        "",
-        "### End (UTC)",
-        "YYYY-MM-DDTHH:MM:SSZ",
-        "",
-        "### Reason",
-        "Describe the technical reason.",
-        "",
-        "### Contact",
-        "@username",
-        "",
-        "### Security policy",
-        "- [x] I will not include credentials or secrets in this issue."
-      ].join("\n")
-    );
-  } else {
-    params.set("template", "booking.md");
-  }
-
-  return `${gitHost}/${repoSlug}/issues/new?${params.toString()}`;
-}
-
 function parseDate(value) {
   if (!value) return null;
   const d = new Date(value);
   return Number.isNaN(d.getTime()) ? null : d;
 }
 
-function formatUtc(value) {
+function ceilToMinute(value) {
+  const d = new Date(value);
+  if (d.getSeconds() > 0 || d.getMilliseconds() > 0) {
+    d.setMinutes(d.getMinutes() + 1);
+  }
+  d.setSeconds(0, 0);
+  return d;
+}
+
+function addHours(value, hours) {
+  return new Date(value.getTime() + hours * 60 * 60 * 1000);
+}
+
+function toUtcNoSeconds(value) {
+  const d = ceilToMinute(value);
+  return `${d.toISOString().slice(0, 16)}Z`;
+}
+
+function formatLocal(value) {
   const d = parseDate(value);
   if (!d) return "-";
-  return d.toISOString().replace(".000", "");
+  return new Intl.DateTimeFormat(undefined, {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+    timeZoneName: "short"
+  }).format(d);
+}
+
+function issueCreateUrl(gitHost, repoSlug, prefill = {}) {
+  if (!repoSlug) return "#";
+
+  const startUtc = prefill.startUtc || toUtcNoSeconds(new Date());
+  const endUtc = prefill.endUtc || toUtcNoSeconds(addHours(parseDate(startUtc) || new Date(), 24));
+  const resourceId = prefill.resourceId || "<resource-id>";
+
+  const body = [
+    "Resource ID",
+    resourceId,
+    "",
+    "Start (UTC)",
+    startUtc,
+    "",
+    "End (UTC)",
+    endUtc,
+    "",
+    "Reason",
+    "Describe the technical reason.",
+    "",
+    "Contact",
+    "@username"
+  ].join("\n");
+
+  const params = new URLSearchParams({
+    labels: "booking,status:pending",
+    title: `[BOOKING] ${resourceId} <start-end>`,
+    body
+  });
+
+  return `${gitHost}/${repoSlug}/issues/new?${params.toString()}`;
 }
 
 function currentReservationFor(resourceId, reservations, now) {
@@ -80,7 +103,32 @@ function currentReservationFor(resourceId, reservations, now) {
   });
 }
 
-function renderResourceCard(resource, currentReservation, bookUrl) {
+function nextSuggestedWindow(resourceId, reservations, now) {
+  const intervals = reservations
+    .filter((item) => item.resource_id === resourceId && BUSY_STATUSES.has(item.status))
+    .map((item) => ({
+      start: parseDate(item.start_utc),
+      end: parseDate(item.end_utc)
+    }))
+    .filter((x) => x.start && x.end && x.start < x.end)
+    .sort((a, b) => a.start.getTime() - b.start.getTime());
+
+  let cursor = ceilToMinute(now);
+  for (const interval of intervals) {
+    if (interval.end <= cursor) continue;
+    if (interval.start > cursor) break;
+    cursor = ceilToMinute(interval.end);
+  }
+
+  const start = cursor;
+  const end = addHours(start, 24);
+  return {
+    startUtc: toUtcNoSeconds(start),
+    endUtc: toUtcNoSeconds(end)
+  };
+}
+
+function renderResourceCard(resource, currentReservation, suggestion, bookUrl) {
   const box = document.createElement("article");
   box.className = "card";
 
@@ -94,7 +142,7 @@ function renderResourceCard(resource, currentReservation, bookUrl) {
     : "<span class=\"muted\">No alerts</span>";
 
   const owner = currentReservation?.owner || resource.default_owner || "-";
-  const until = currentReservation ? formatUtc(currentReservation.end_utc) : "-";
+  const until = currentReservation ? formatLocal(currentReservation.end_utc) : "-";
 
   box.innerHTML = `
     <div>
@@ -107,6 +155,8 @@ function renderResourceCard(resource, currentReservation, bookUrl) {
     <div class="meta">Public IP: <code>${resource.public_ip || "-"}</code></div>
     <div>Current owner: <strong>${owner}</strong></div>
     <div>Occupied until: <strong>${until}</strong></div>
+    <div class="meta">Suggested start (UTC): <code>${suggestion.startUtc}</code></div>
+    <div class="meta">Suggested end (UTC): <code>${suggestion.endUtc}</code></div>
     <div>CPU ${resource.health.cpu_pct}% | RAM ${resource.health.memory_pct}% | GPU ${resource.health.gpu_pct}%</div>
     <div>Alerts: ${alertList}</div>
     <div class="meta">SSH: <code>${resource.access.ssh}</code></div>
@@ -139,8 +189,8 @@ function renderReservations(rows) {
     tr.innerHTML = `
       <td>${item.resource_id || "-"}</td>
       <td>${item.owner || "-"}</td>
-      <td>${formatUtc(item.start_utc)}</td>
-      <td>${formatUtc(item.end_utc)}</td>
+      <td>${formatLocal(item.start_utc)}</td>
+      <td>${formatLocal(item.end_utc)}</td>
       <td>${item.status || "-"}</td>
       <td>${issueLink}</td>
     `;
@@ -171,8 +221,13 @@ async function loadDashboard() {
 
   resources.forEach((resource) => {
     const current = currentReservationFor(resource.id, reservations, now);
-    const resourceBookUrl = issueCreateUrl(gitHost, repoSlug, { resourceId: resource.id });
-    list.appendChild(renderResourceCard(resource, current, resourceBookUrl));
+    const suggestion = nextSuggestedWindow(resource.id, reservations, now);
+    const resourceBookUrl = issueCreateUrl(gitHost, repoSlug, {
+      resourceId: resource.id,
+      startUtc: suggestion.startUtc,
+      endUtc: suggestion.endUtc
+    });
+    list.appendChild(renderResourceCard(resource, current, suggestion, resourceBookUrl));
   });
 
   const sortedReservations = [...reservations].sort((a, b) => {
@@ -183,10 +238,15 @@ async function loadDashboard() {
   renderReservations(sortedReservations);
 
   const updated = reservationsData.generated_at || resourcesData.generated_at || new Date().toISOString();
-  document.getElementById("last-updated").textContent = `Data updated: ${formatUtc(updated)}`;
+  const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone || "local timezone";
+  document.getElementById("last-updated").textContent = `Data updated: ${formatLocal(updated)} (${timeZone})`;
 
+  const defaultStart = ceilToMinute(now);
   const link = document.getElementById("new-booking-link");
-  link.href = issueCreateUrl(gitHost, repoSlug);
+  link.href = issueCreateUrl(gitHost, repoSlug, {
+    startUtc: toUtcNoSeconds(defaultStart),
+    endUtc: toUtcNoSeconds(addHours(defaultStart, 24))
+  });
 }
 
 loadDashboard().catch((error) => {

@@ -8,7 +8,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        Fill in all fields in UTC.
+        Fill in all fields in UTC (without seconds).
   - type: input
     id: resource
     attributes:
@@ -21,16 +21,16 @@ body:
     id: start_utc
     attributes:
       label: Start (UTC)
-      description: Recommended format: ISO 8601
-      placeholder: 2026-03-04T09:00:00Z
+      description: Recommended format
+      placeholder: 2026-03-04T09:00Z
     validations:
       required: true
   - type: input
     id: end_utc
     attributes:
       label: End (UTC)
-      description: Recommended format: ISO 8601
-      placeholder: 2026-03-04T18:00:00Z
+      description: Recommended format
+      placeholder: 2026-03-05T09:00Z
     validations:
       required: true
   - type: textarea
@@ -49,10 +49,3 @@ body:
       placeholder: @username
     validations:
       required: true
-  - type: checkboxes
-    id: policy
-    attributes:
-      label: Security policy
-      options:
-        - label: I will not include credentials or secrets in this issue.
-          required: true

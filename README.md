@@ -7,6 +7,7 @@ This repository provides a lightweight system to:
 - see who owns a running reservation and until when
 - expose access instructions without leaking credentials
 - publish a static dashboard on GitHub Pages
+- prefill booking start/end automatically per resource (next available window)
 
 ## Architecture
 
@@ -42,6 +43,7 @@ This repository provides a lightweight system to:
 3. If no conflict is found, it sets `status:approved`; otherwise `status:denied`.
 4. `deploy-pages` reads issues and generates `reservations.json`.
 5. The Pages dashboard shows current status, owner, end time, and upcoming reservations.
+6. Times are displayed in each viewer's local timezone; booking fields are prefilled in UTC.
 
 ## Access Security
 

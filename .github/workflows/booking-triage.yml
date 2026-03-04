@@ -19,14 +19,28 @@ jobs:
           script: |
             const issue = context.payload.issue;
             const marker = "<!-- booking-bot -->";
-            const STATUS_LABELS = new Set(["status:pending", "status:approved", "status:denied", "status:active", "status:done"]);
             const BUSY_STATUS_LABELS = new Set(["status:pending", "status:approved", "status:active"]);
+            const FIELD_TITLES = ["Resource ID", "Start (UTC)", "End (UTC)", "Reason", "Contact"];
 
             const escapeRegex = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
             const extractField = (body, title) => {
-              const regex = new RegExp(`###\\s*${escapeRegex(title)}\\s*\\n([\\s\\S]*?)(?=\\n###\\s|$)`, "i");
-              const match = body.match(regex);
-              return (match?.[1] || "").trim();
+              const source = body || "";
+
+              const markdownHeading = new RegExp(`###\\s*${escapeRegex(title)}\\s*\\n([\\s\\S]*?)(?=\\n###\\s|$)`, "i");
+              const headingMatch = source.match(markdownHeading);
+              if (headingMatch?.[1]) return headingMatch[1].trim();
+
+              const keyValue = new RegExp(`^\\s*${escapeRegex(title)}\\s*:\\s*(.+)$`, "im");
+              const keyValueMatch = source.match(keyValue);
+              if (keyValueMatch?.[1]) return keyValueMatch[1].trim();
+
+              const titlesAlternation = FIELD_TITLES.map(escapeRegex).join("|");
+              const blockFormat = new RegExp(
+                `(?:^|\\n)\\s*${escapeRegex(title)}\\s*\\n([\\s\\S]*?)(?=\\n\\s*(?:${titlesAlternation})\\s*(?:\\n|:)|$)`,
+                "i"
+              );
+              const blockMatch = source.match(blockFormat);
+              return (blockMatch?.[1] || "").trim();
             };
 
             const parseTime = (value) => {
