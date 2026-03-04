@@ -72,27 +72,14 @@ function issueCreateUrl(gitHost, repoSlug, prefill = {}) {
   const endUtc = prefill.endUtc || toUtcNoSeconds(addHours(parseDate(startUtc) || new Date(), 24));
   const resourceId = prefill.resourceId || "<resource-id>";
 
-  const body = [
-    "Resource ID",
-    resourceId,
-    "",
-    "Start (UTC)",
-    startUtc,
-    "",
-    "End (UTC)",
-    endUtc,
-    "",
-    "Reason",
-    "Describe the technical reason.",
-    "",
-    "Contact",
-    "@username"
-  ].join("\n");
-
   const params = new URLSearchParams({
-    labels: "booking,status:pending",
-    title: `[BOOKING] ${resourceId} <start-end>`,
-    body
+    template: "booking.yml",
+    title: `Booking ${resourceId}`,
+    resource: resourceId,
+    start_utc: startUtc,
+    end_utc: endUtc,
+    reason: "Briefly describe what you need to run.",
+    contact: "@username"
   });
 
   return `${gitHost}/${repoSlug}/issues/new?${params.toString()}`;
@@ -279,12 +266,6 @@ async function loadDashboard() {
   const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone || "local timezone";
   document.getElementById("last-updated").textContent = `Data updated: ${formatLocal(updated)} (${timeZone})`;
 
-  const defaultStart = ceilToMinute(now);
-  const link = document.getElementById("new-booking-link");
-  link.href = issueCreateUrl(gitHost, repoSlug, {
-    startUtc: toUtcNoSeconds(defaultStart),
-    endUtc: toUtcNoSeconds(addHours(defaultStart, 24))
-  });
 }
 
 loadDashboard().catch((error) => {

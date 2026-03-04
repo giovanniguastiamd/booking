@@ -1,9 +1,11 @@
 ---
-name: Booking request (Markdown fallback)
-about: Request a compute resource booking
-title: "[BOOKING] <resource-id> <start-end>"
+name: Reserve a machine (Markdown fallback)
+about: Tell us which machine you need and for how long
+title: "Booking <resource-id>"
 labels: booking,status:pending
 ---
+
+Please fill in the fields below. Use UTC format `YYYY-MM-DDTHH:MMZ`.
 
 Resource ID
 <resource-id>
@@ -15,7 +17,7 @@ End (UTC)
 YYYY-MM-DDTHH:MMZ
 
 Reason
-Describe the technical reason.
+Briefly describe what you need to run.
 
 Contact
 @username
