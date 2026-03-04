@@ -16,7 +16,7 @@
       "default_owner": "ml-platform",
       "access": {
         "ssh": "ssh <username>@server-a.internal",
-        "vpn_doc": "https://gitenterprise.xilinx.com/gguasti/booking/wiki/VPN",
+        "vpn_doc": "https://github.com/giovanniguastiamd/booking/wiki/VPN",
         "slurm": "N/A",
         "notes": "Usa solo credenziali personali (no password condivise)."
       }
@@ -38,7 +38,7 @@
       "default_owner": "hpc-team",
       "access": {
         "ssh": "ssh <username>@login.cluster-x.internal",
-        "vpn_doc": "https://gitenterprise.xilinx.com/gguasti/booking/wiki/VPN",
+        "vpn_doc": "https://github.com/giovanniguastiamd/booking/wiki/VPN",
         "slurm": "sbatch --partition=gpu --gres=gpu:1 job.sbatch",
         "notes": "Connettersi al nodo login; no accesso diretto ai compute node."
       }
@@ -60,7 +60,7 @@
       "default_owner": "ops",
       "access": {
         "ssh": "ssh <username>@vm-nlp-01.internal",
-        "vpn_doc": "https://gitenterprise.xilinx.com/gguasti/booking/wiki/VPN",
+        "vpn_doc": "https://github.com/giovanniguastiamd/booking/wiki/VPN",
         "slurm": "N/A",
         "notes": "Aprire ticket ops prima di richiedere la riattivazione."
       }
