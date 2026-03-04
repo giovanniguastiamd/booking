@@ -22,6 +22,8 @@ This repository provides a lightweight system to:
 
 ## Operating Flow
 
+Go to the page https://giovanniguastiamd.github.io/booking/ 
+
 1. On each resource card, the action button changes behavior:
    - `Book This Machine` when free
    - `Free This Machine` when currently occupied
