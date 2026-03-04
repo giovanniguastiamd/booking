@@ -1,0 +1,184 @@
+name: Free machine
+
+on:
+  issues:
+    types: [opened, edited, reopened]
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  process-free-request:
+    if: contains(github.event.issue.title, '[FREE]') || contains(join(github.event.issue.labels.*.name, ','), 'release')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Process free machine request
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const issue = context.payload.issue;
+            const marker = "<!-- free-bot -->";
+            const FIELD_TITLES = ["Resource ID", "Booking Issue", "Reason", "Contact", "Start (UTC)", "End (UTC)"];
+
+            const escapeRegex = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+            const extractField = (body, title) => {
+              const source = body || "";
+
+              const markdownHeading = new RegExp(`###\\s*${escapeRegex(title)}\\s*\\n([\\s\\S]*?)(?=\\n###\\s|$)`, "i");
+              const headingMatch = source.match(markdownHeading);
+              if (headingMatch?.[1]) return headingMatch[1].trim();
+
+              const keyValue = new RegExp(`^\\s*${escapeRegex(title)}\\s*:\\s*(.+)$`, "im");
+              const keyValueMatch = source.match(keyValue);
+              if (keyValueMatch?.[1]) return keyValueMatch[1].trim();
+
+              const titlesAlternation = FIELD_TITLES.map(escapeRegex).join("|");
+              const blockFormat = new RegExp(
+                `(?:^|\\n)\\s*${escapeRegex(title)}\\s*\\n([\\s\\S]*?)(?=\\n\\s*(?:${titlesAlternation})\\s*(?:\\n|:)|$)`,
+                "i"
+              );
+              const blockMatch = source.match(blockFormat);
+              return (blockMatch?.[1] || "").trim();
+            };
+
+            const parseIssueNumber = (value) => {
+              const match = (value || "").match(/\d+/);
+              if (!match) return null;
+              const n = Number.parseInt(match[0], 10);
+              return Number.isFinite(n) ? n : null;
+            };
+
+            const parseTime = (value) => {
+              const date = new Date(value);
+              if (Number.isNaN(date.getTime())) return null;
+              return date;
+            };
+
+            const issueLabels = issue.labels.map((label) => label.name || label);
+            const resourceFromLabel = issueLabels.find((name) => name.startsWith("resource:"))?.slice("resource:".length);
+            const requestedResource = extractField(issue.body || "", "Resource ID") || resourceFromLabel || "";
+            const bookingIssueNumber = parseIssueNumber(extractField(issue.body || "", "Booking Issue"));
+            const actor = issue.user?.login || "unknown-user";
+
+            const { owner, repo } = context.repo;
+
+            const upsertBotComment = async (message) => {
+              const comments = await github.paginate(github.rest.issues.listComments, {
+                owner,
+                repo,
+                issue_number: issue.number,
+                per_page: 100
+              });
+              const body = `${marker}\n${message}`;
+              const existing = comments.find((c) => c.user?.type === "Bot" && c.body?.includes(marker));
+              if (existing) {
+                await github.rest.issues.updateComment({ owner, repo, comment_id: existing.id, body });
+              } else {
+                await github.rest.issues.createComment({ owner, repo, issue_number: issue.number, body });
+              }
+            };
+
+            const setFreeRequestStatus = async (statusLabel) => {
+              const clean = issueLabels.filter((name) => !name.startsWith("status:"));
+              const next = new Set([...clean, statusLabel]);
+              await github.rest.issues.setLabels({
+                owner,
+                repo,
+                issue_number: issue.number,
+                labels: [...next]
+              });
+            };
+
+            const denyRequest = async (message) => {
+              await setFreeRequestStatus("status:denied");
+              await upsertBotComment(message);
+            };
+
+            if (!requestedResource || !bookingIssueNumber) {
+              await denyRequest("Free request denied: both `Resource ID` and `Booking Issue` are required.");
+              return;
+            }
+
+            let bookingIssue;
+            try {
+              const response = await github.rest.issues.get({
+                owner,
+                repo,
+                issue_number: bookingIssueNumber
+              });
+              bookingIssue = response.data;
+            } catch {
+              await denyRequest(`Free request denied: booking issue #${bookingIssueNumber} was not found.`);
+              return;
+            }
+
+            const bookingLabels = bookingIssue.labels.map((label) => label.name || label);
+            if (!bookingLabels.includes("booking")) {
+              await denyRequest(`Free request denied: issue #${bookingIssueNumber} is not a booking issue.`);
+              return;
+            }
+
+            const bookingBody = bookingIssue.body || "";
+            const bookingResourceFromLabel =
+              bookingLabels.find((name) => name.startsWith("resource:"))?.slice("resource:".length) || "";
+            const bookingResource = extractField(bookingBody, "Resource ID") || bookingResourceFromLabel || "";
+            if (bookingResource && bookingResource !== requestedResource) {
+              await denyRequest(
+                `Free request denied: booking #${bookingIssueNumber} belongs to \`${bookingResource}\`, not \`${requestedResource}\`.`
+              );
+              return;
+            }
+
+            if (bookingLabels.includes("status:done") || bookingLabels.includes("status:denied")) {
+              await denyRequest(`Free request denied: booking #${bookingIssueNumber} is already closed.`);
+              return;
+            }
+
+            const start = parseTime(extractField(bookingBody, "Start (UTC)"));
+            const end = parseTime(extractField(bookingBody, "End (UTC)"));
+            const now = new Date();
+            if (start && end && !(start <= now && now < end)) {
+              await denyRequest(
+                `Free request denied: booking #${bookingIssueNumber} is not active at ${now.toISOString()}.`
+              );
+              return;
+            }
+
+            const cleanedBookingLabels = bookingLabels.filter((name) => !name.startsWith("status:"));
+            const bookingNextLabels = new Set([...cleanedBookingLabels, "booking", "status:done"]);
+            await github.rest.issues.setLabels({
+              owner,
+              repo,
+              issue_number: bookingIssueNumber,
+              labels: [...bookingNextLabels]
+            });
+
+            await github.rest.issues.createComment({
+              owner,
+              repo,
+              issue_number: bookingIssueNumber,
+              body:
+                `Released early by @${actor} via free request #${issue.number} ` +
+                `at ${now.toISOString()} (UTC).`
+            });
+
+            await github.rest.issues.update({
+              owner,
+              repo,
+              issue_number: bookingIssueNumber,
+              state: "closed"
+            });
+
+            await setFreeRequestStatus("status:done");
+            await upsertBotComment(
+              `Resource \`${requestedResource}\` released by @${actor}. ` +
+              `Booking #${bookingIssueNumber} has been marked \`status:done\` and closed.`
+            );
+
+            await github.rest.issues.update({
+              owner,
+              repo,
+              issue_number: issue.number,
+              state: "closed"
+            });

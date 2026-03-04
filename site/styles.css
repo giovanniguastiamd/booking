@@ -128,6 +128,12 @@ td {
   border-color: #9fb8f5;
 }
 
+.danger {
+  background: #fff6f7;
+  color: var(--bad);
+  border-color: #f0a8b3;
+}
+
 .muted {
   color: #5d6f8f;
   font-size: 0.9rem;

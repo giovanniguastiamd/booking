@@ -92,6 +92,31 @@ function issueCreateUrl(gitHost, repoSlug, prefill = {}) {
   return `${gitHost}/${repoSlug}/issues/new?${params.toString()}`;
 }
 
+function freeIssueCreateUrl(gitHost, repoSlug, prefill = {}) {
+  if (!repoSlug) return "#";
+  if (!prefill.resourceId) return "#";
+
+  const bookingIssue = prefill.bookingIssueNumber ? `#${prefill.bookingIssueNumber}` : "<issue-number>";
+  const body = [
+    "Resource ID",
+    prefill.resourceId,
+    "",
+    "Booking Issue",
+    bookingIssue,
+    "",
+    "Reason",
+    "Finished earlier than expected."
+  ].join("\n");
+
+  const params = new URLSearchParams({
+    labels: "release,status:pending",
+    title: `[FREE] ${prefill.resourceId} ${bookingIssue}`,
+    body
+  });
+
+  return `${gitHost}/${repoSlug}/issues/new?${params.toString()}`;
+}
+
 function currentReservationFor(resourceId, reservations, now) {
   return reservations.find((item) => {
     if (item.resource_id !== resourceId) return false;
@@ -128,7 +153,7 @@ function nextSuggestedWindow(resourceId, reservations, now) {
   };
 }
 
-function renderResourceCard(resource, currentReservation, suggestion, bookUrl) {
+function renderResourceCard(resource, currentReservation, suggestion, action) {
   const box = document.createElement("article");
   box.className = "card";
 
@@ -143,7 +168,7 @@ function renderResourceCard(resource, currentReservation, suggestion, bookUrl) {
 
   const owner = currentReservation?.owner || resource.default_owner || "-";
   const until = currentReservation ? formatLocal(currentReservation.end_utc) : "-";
-
+  const currentIssue = currentReservation?.issue_number ? `#${currentReservation.issue_number}` : "-";
   box.innerHTML = `
     <div>
       <strong>${resource.name}</strong>
@@ -155,6 +180,7 @@ function renderResourceCard(resource, currentReservation, suggestion, bookUrl) {
     <div class="meta">Public IP: <code>${resource.public_ip || "-"}</code></div>
     <div>Current owner: <strong>${owner}</strong></div>
     <div>Occupied until: <strong>${until}</strong></div>
+    <div class="meta">Current booking issue: <strong>${currentIssue}</strong></div>
     <div class="meta">Suggested start (UTC): <code>${suggestion.startUtc}</code></div>
     <div class="meta">Suggested end (UTC): <code>${suggestion.endUtc}</code></div>
     <div>CPU ${resource.health.cpu_pct}% | RAM ${resource.health.memory_pct}% | GPU ${resource.health.gpu_pct}%</div>
@@ -163,7 +189,7 @@ function renderResourceCard(resource, currentReservation, suggestion, bookUrl) {
     <div class="meta">VPN: <a href="${resource.access.vpn_doc}" target="_blank" rel="noreferrer">documentation</a></div>
     <div class="meta">Slurm: <code>${resource.access.slurm}</code></div>
     <div class="meta">${resource.access.notes}</div>
-    <div><a class="button secondary" href="${bookUrl}" target="_blank" rel="noreferrer">Book This Machine</a></div>
+    <div><a class="button ${action.className}" href="${action.href}" target="_blank" rel="noreferrer">${action.label}</a></div>
   `;
 
   return box;
@@ -227,7 +253,14 @@ async function loadDashboard() {
       startUtc: suggestion.startUtc,
       endUtc: suggestion.endUtc
     });
-    list.appendChild(renderResourceCard(resource, current, suggestion, resourceBookUrl));
+    const resourceFreeUrl = freeIssueCreateUrl(gitHost, repoSlug, {
+      resourceId: resource.id,
+      bookingIssueNumber: current?.issue_number
+    });
+    const action = current
+      ? { href: resourceFreeUrl, label: "Free This Machine", className: "danger" }
+      : { href: resourceBookUrl, label: "Book This Machine", className: "secondary" };
+    list.appendChild(renderResourceCard(resource, current, suggestion, action));
   });
 
   const sortedReservations = [...reservations].sort((a, b) => {

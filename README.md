@@ -16,12 +16,14 @@ This repository provides a lightweight system to:
 - Reservations: GitHub Issues with labels (`booking`, `resource:*`, `status:*`)
 - Automation:
   - `.github/workflows/booking-triage.yml`: validates conflicts and applies status labels
+  - `.github/workflows/free-machine.yml`: processes early release requests and tracks who released
   - `.github/workflows/deploy-pages.yml`: regenerates `reservations.json` and deploys Pages
 
 ## Quick Setup
 
 1. Create these labels in the repo:
    - `booking`
+   - `release`
    - `status:pending`
    - `status:approved`
    - `status:denied`
@@ -38,12 +40,15 @@ This repository provides a lightweight system to:
 
 ## Operating Flow
 
-1. A team member opens a `Booking request` issue (YAML form or Markdown fallback).
-2. `booking-triage` checks time overlaps for the same resource.
+1. On each resource card, the action button changes behavior:
+   - `Book This Machine` when free
+   - `Free This Machine` when currently occupied
+2. A booking request is validated by `booking-triage` for overlaps on the same resource.
 3. If no conflict is found, it sets `status:approved`; otherwise `status:denied`.
-4. `deploy-pages` reads issues and generates `reservations.json`.
-5. The Pages dashboard shows current status, owner, end time, and upcoming reservations.
-6. Times are displayed in each viewer's local timezone; booking fields are prefilled in UTC.
+4. If `Free This Machine` is used, `free-machine` marks the booking as `status:done`, closes it, and posts an audit comment with the GitHub user who released it.
+5. `deploy-pages` reads issues and generates `reservations.json`.
+6. The Pages dashboard shows current status, owner, end time, and upcoming reservations.
+7. Times are displayed in each viewer's local timezone; booking fields are prefilled in UTC.
 
 ## Access Security
 
