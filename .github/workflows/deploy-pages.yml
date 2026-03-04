@@ -6,6 +6,9 @@ on:
     branches: [main]
   issues:
     types: [opened, edited, reopened, closed, labeled, unlabeled]
+  workflow_run:
+    workflows: ["Booking triage", "Free machine"]
+    types: [completed]
 
 permissions:
   contents: read
