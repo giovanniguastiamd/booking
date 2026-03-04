@@ -45,6 +45,12 @@ function toUtcNoSeconds(value) {
   return `${d.toISOString().slice(0, 16)}Z`;
 }
 
+function formatUtcCompact(value) {
+  const d = parseDate(value);
+  if (!d) return "-";
+  return d.toISOString().slice(0, 16).replace("T", " ");
+}
+
 function formatLocal(value) {
   const d = parseDate(value);
   if (!d) return "-";
@@ -164,6 +170,13 @@ function renderResourceCard(resource, currentReservation, suggestion, action) {
   const owner = currentReservation?.owner || resource.default_owner || "-";
   const until = currentReservation ? formatLocal(currentReservation.end_utc) : "-";
   const currentIssue = currentReservation?.issue_number ? `#${currentReservation.issue_number}` : "-";
+  const utcWindow = currentReservation
+    ? `
+    <div class="meta">Started (UTC): <code>${formatUtcCompact(currentReservation.start_utc)}</code></div>
+    <div class="meta">Will be released (UTC): <code>${formatUtcCompact(currentReservation.end_utc)}</code></div>`
+    : `
+    <div class="meta">Suggested start (UTC): <code>${formatUtcCompact(suggestion.startUtc)}</code></div>
+    <div class="meta">Suggested end (UTC): <code>${formatUtcCompact(suggestion.endUtc)}</code></div>`;
   box.innerHTML = `
     <div>
       <strong>${resource.name}</strong>
@@ -176,8 +189,7 @@ function renderResourceCard(resource, currentReservation, suggestion, action) {
     <div>Current owner: <strong>${owner}</strong></div>
     <div>Occupied until: <strong>${until}</strong></div>
     <div class="meta">Current booking issue: <strong>${currentIssue}</strong></div>
-    <div class="meta">Suggested start (UTC): <code>${suggestion.startUtc}</code></div>
-    <div class="meta">Suggested end (UTC): <code>${suggestion.endUtc}</code></div>
+    ${utcWindow}
     <div class="meta">SSH: <code>${resource.access.ssh}</code></div>
     <div class="meta">VPN: <a href="${resource.access.vpn_doc}" target="_blank" rel="noreferrer">documentation</a></div>
     <div><a class="button ${action.className}" href="${action.href}" target="_blank" rel="noreferrer">${action.label}</a></div>
