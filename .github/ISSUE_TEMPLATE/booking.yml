@@ -1,5 +1,5 @@
 name: Booking request
-description: Richiedi prenotazione di una risorsa di calcolo
+description: Request a compute resource booking
 title: "[BOOKING] <resource-id> <start-end>"
 labels:
   - booking
@@ -8,12 +8,12 @@ body:
   - type: markdown
     attributes:
       value: |
-        Compila tutti i campi in UTC.
+        Fill in all fields in UTC.
   - type: input
     id: resource
     attributes:
       label: Resource ID
-      description: Esempio: server-a, cluster-x, vm-nlp-01
+      description: Example: server-a, cluster-x, vm-nlp-01
       placeholder: server-a
     validations:
       required: true
@@ -21,7 +21,7 @@ body:
     id: start_utc
     attributes:
       label: Start (UTC)
-      description: Formato consigliato ISO 8601
+      description: Recommended format: ISO 8601
       placeholder: 2026-03-04T09:00:00Z
     validations:
       required: true
@@ -29,7 +29,7 @@ body:
     id: end_utc
     attributes:
       label: End (UTC)
-      description: Formato consigliato ISO 8601
+      description: Recommended format: ISO 8601
       placeholder: 2026-03-04T18:00:00Z
     validations:
       required: true
@@ -37,7 +37,7 @@ body:
     id: reason
     attributes:
       label: Reason
-      description: Motivazione tecnica
+      description: Technical reason
       placeholder: Train model X with dataset Y
     validations:
       required: true
@@ -45,7 +45,7 @@ body:
     id: contact
     attributes:
       label: Contact
-      description: GitHub handle, email o Slack
+      description: GitHub handle, email, or Slack
       placeholder: @username
     validations:
       required: true
@@ -54,5 +54,5 @@ body:
     attributes:
       label: Security policy
       options:
-        - label: Non inseriro credenziali/segreti nell'issue.
+        - label: I will not include credentials or secrets in this issue.
           required: true

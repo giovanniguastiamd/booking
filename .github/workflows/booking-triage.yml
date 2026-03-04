@@ -81,8 +81,8 @@ jobs:
             if (!resource || !start || !end || !(start < end) || !contact) {
               await setStatusAndResourceLabels("status:denied", resource || "unknown");
               await updateBotComment(
-                "Prenotazione rifiutata automaticamente: campi mancanti o invalidi. " +
-                "Servono `Resource ID`, `Start (UTC)`, `End (UTC)` con inizio < fine, e `Contact`."
+                "Booking automatically denied: missing or invalid fields. " +
+                "Required: `Resource ID`, `Start (UTC)`, `End (UTC)` with start < end, and `Contact`."
               );
               return;
             }
@@ -121,13 +121,13 @@ jobs:
             if (blockers.length) {
               await setStatusAndResourceLabels("status:denied", resource);
               await updateBotComment(
-                `Conflitto rilevato su \`${resource}\` con issue: ${blockers.map((n) => `#${n}`).join(", ")}. ` +
-                "La richiesta e stata marcata `status:denied`."
+                `Conflict detected on \`${resource}\` with issues: ${blockers.map((n) => `#${n}`).join(", ")}. ` +
+                "This request was labeled `status:denied`."
               );
               return;
             }
 
             await setStatusAndResourceLabels("status:approved", resource);
             await updateBotComment(
-              `Prenotazione approvata per \`${resource}\` da ${start.toISOString()} a ${end.toISOString()} (UTC).`
+              `Booking approved for \`${resource}\` from ${start.toISOString()} to ${end.toISOString()} (UTC).`
             );

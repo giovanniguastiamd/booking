@@ -18,7 +18,7 @@
         "ssh": "ssh <username>@server-a.internal",
         "vpn_doc": "https://github.com/giovanniguastiamd/booking/wiki/VPN",
         "slurm": "N/A",
-        "notes": "Usa solo credenziali personali (no password condivise)."
+        "notes": "Use personal credentials only (no shared passwords)."
       }
     },
     {
@@ -32,7 +32,7 @@
         "gpu_pct": 66,
         "cpu_pct": 74,
         "alerts": [
-          "Memoria sopra soglia 75%"
+          "Memory usage above 75% threshold"
         ]
       },
       "default_owner": "hpc-team",
@@ -40,7 +40,7 @@
         "ssh": "ssh <username>@login.cluster-x.internal",
         "vpn_doc": "https://github.com/giovanniguastiamd/booking/wiki/VPN",
         "slurm": "sbatch --partition=gpu --gres=gpu:1 job.sbatch",
-        "notes": "Connettersi al nodo login; no accesso diretto ai compute node."
+        "notes": "Connect through the login node; no direct access to compute nodes."
       }
     },
     {
@@ -54,7 +54,7 @@
         "gpu_pct": 0,
         "cpu_pct": 0,
         "alerts": [
-          "Offline per manutenzione"
+          "Offline for maintenance"
         ]
       },
       "default_owner": "ops",
@@ -62,7 +62,7 @@
         "ssh": "ssh <username>@vm-nlp-01.internal",
         "vpn_doc": "https://github.com/giovanniguastiamd/booking/wiki/VPN",
         "slurm": "N/A",
-        "notes": "Aprire ticket ops prima di richiedere la riattivazione."
+        "notes": "Open an ops ticket before requesting reactivation."
       }
     }
   ]

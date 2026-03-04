@@ -1,11 +1,11 @@
 ---
 name: Booking request (Markdown fallback)
-about: Richiedi prenotazione di una risorsa di calcolo
+about: Request a compute resource booking
 title: "[BOOKING] <resource-id> <start-end>"
 labels: booking,status:pending
 ---
 
-Compila tutti i campi in UTC.
+Fill in all fields in UTC.
 
 ### Resource ID
 server-a
@@ -17,10 +17,10 @@ server-a
 2026-03-04T18:00:00Z
 
 ### Reason
-Descrivi la motivazione tecnica.
+Describe the technical reason.
 
 ### Contact
 @username
 
 ### Security policy
-- [x] Non inseriro credenziali/segreti nell'issue.
+- [x] I will not include credentials or secrets in this issue.

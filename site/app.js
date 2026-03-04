@@ -63,7 +63,7 @@ function renderResourceCard(resource, currentReservation) {
   const alerts = resource.health?.alerts || [];
   const alertList = alerts.length
     ? `<ul>${alerts.map((x) => `<li>${x}</li>`).join("")}</ul>`
-    : "<span class=\"muted\">Nessun alert</span>";
+    : "<span class=\"muted\">No alerts</span>";
 
   const owner = currentReservation?.owner || resource.default_owner || "-";
   const until = currentReservation ? formatUtc(currentReservation.end_utc) : "-";
@@ -74,13 +74,13 @@ function renderResourceCard(resource, currentReservation) {
       <span class="meta"> (${resource.id})</span>
     </div>
     <span class="badge ${uiStatus}">${uiStatus.toUpperCase()}</span>
-    <div class="meta">Tipo: ${resource.kind} | Zona: ${resource.location}</div>
-    <div>Owner attuale: <strong>${owner}</strong></div>
-    <div>Occupata fino a: <strong>${until}</strong></div>
+    <div class="meta">Type: ${resource.kind} | Location: ${resource.location}</div>
+    <div>Current owner: <strong>${owner}</strong></div>
+    <div>Occupied until: <strong>${until}</strong></div>
     <div>CPU ${resource.health.cpu_pct}% | RAM ${resource.health.memory_pct}% | GPU ${resource.health.gpu_pct}%</div>
-    <div>Alert: ${alertList}</div>
+    <div>Alerts: ${alertList}</div>
     <div class="meta">SSH: <code>${resource.access.ssh}</code></div>
-    <div class="meta">VPN: <a href="${resource.access.vpn_doc}" target="_blank" rel="noreferrer">documentazione</a></div>
+    <div class="meta">VPN: <a href="${resource.access.vpn_doc}" target="_blank" rel="noreferrer">documentation</a></div>
     <div class="meta">Slurm: <code>${resource.access.slurm}</code></div>
     <div class="meta">${resource.access.notes}</div>
   `;
@@ -94,7 +94,7 @@ function renderReservations(rows) {
 
   if (!rows.length) {
     const tr = document.createElement("tr");
-    tr.innerHTML = "<td colspan=\"6\">Nessuna prenotazione disponibile</td>";
+    tr.innerHTML = "<td colspan=\"6\">No reservations available</td>";
     tbody.appendChild(tr);
     return;
   }
@@ -124,7 +124,7 @@ async function loadDashboard() {
   ]);
 
   if (!resourcesRes.ok || !reservationsRes.ok) {
-    throw new Error("Impossibile caricare i dati della dashboard.");
+    throw new Error("Unable to load dashboard data.");
   }
 
   const resourcesData = await resourcesRes.json();
@@ -149,7 +149,7 @@ async function loadDashboard() {
   renderReservations(sortedReservations);
 
   const updated = reservationsData.generated_at || resourcesData.generated_at || new Date().toISOString();
-  document.getElementById("last-updated").textContent = `Aggiornamento dati: ${formatUtc(updated)}`;
+  document.getElementById("last-updated").textContent = `Data updated: ${formatUtc(updated)}`;
 
   const link = document.getElementById("new-booking-link");
   link.href = issueCreateUrl(detectGitHost(), detectRepoSlug());
@@ -157,5 +157,5 @@ async function loadDashboard() {
 
 loadDashboard().catch((error) => {
   const list = document.getElementById("resource-list");
-  list.innerHTML = `<div class="card">Errore caricamento: ${error.message}</div>`;
+  list.innerHTML = `<div class="card">Loading error: ${error.message}</div>`;
 });
