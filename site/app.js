@@ -23,7 +23,7 @@ function detectGitHost() {
 function issueCreateUrl(gitHost, repoSlug) {
   if (!repoSlug) return "#";
   const params = new URLSearchParams({
-    template: "booking.yml",
+    template: "booking.md",
     labels: "booking,status:pending"
   });
   return `${gitHost}/${repoSlug}/issues/new?${params.toString()}`;

@@ -37,7 +37,7 @@ Questo repository implementa un sistema semplice per:
 
 ## Flusso operativo
 
-1. Team apre una issue con template `Booking request`.
+1. Team apre una issue con template `Booking request` (form YAML o fallback Markdown).
 2. Il workflow `booking-triage` controlla sovrapposizioni temporali sulla stessa risorsa.
 3. Se non ci sono conflitti: label `status:approved`; altrimenti `status:denied`.
 4. Il workflow `deploy-pages` legge le issue e genera `reservations.json`.
