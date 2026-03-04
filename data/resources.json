@@ -2,67 +2,195 @@
   "generated_at": "2026-03-04T00:00:00Z",
   "resources": [
     {
-      "id": "server-a",
-      "name": "Server A100 01",
+      "id": "mia1-p02-g50",
+      "name": "mia1-p02-g50",
       "kind": "server",
       "status": "online",
-      "location": "dc-milano",
+      "location": "us-mia-1",
+      "hostname": "mia1-p02-g50",
+      "public_ip": "10.24.112.161",
       "health": {
-        "memory_pct": 42,
-        "gpu_pct": 33,
-        "cpu_pct": 18,
-        "alerts": []
+        "memory_pct": 0,
+        "gpu_pct": 0,
+        "cpu_pct": 0,
+        "alerts": [
+          "Telemetry not yet configured"
+        ]
       },
-      "default_owner": "ml-platform",
+      "default_owner": "unassigned",
       "access": {
-        "ssh": "ssh <username>@server-a.internal",
+        "ssh": "ssh <username>@10.24.112.161",
         "vpn_doc": "https://github.com/giovanniguastiamd/booking/wiki/VPN",
         "slurm": "N/A",
         "notes": "Use personal credentials only (no shared passwords)."
       }
     },
     {
-      "id": "cluster-x",
-      "name": "Cluster X",
-      "kind": "cluster",
+      "id": "mia1-p02-g51",
+      "name": "mia1-p02-g51",
+      "kind": "server",
       "status": "online",
-      "location": "dc-roma",
-      "health": {
-        "memory_pct": 79,
-        "gpu_pct": 66,
-        "cpu_pct": 74,
-        "alerts": [
-          "Memory usage above 75% threshold"
-        ]
-      },
-      "default_owner": "hpc-team",
-      "access": {
-        "ssh": "ssh <username>@login.cluster-x.internal",
-        "vpn_doc": "https://github.com/giovanniguastiamd/booking/wiki/VPN",
-        "slurm": "sbatch --partition=gpu --gres=gpu:1 job.sbatch",
-        "notes": "Connect through the login node; no direct access to compute nodes."
-      }
-    },
-    {
-      "id": "vm-nlp-01",
-      "name": "VM NLP 01",
-      "kind": "vm",
-      "status": "offline",
-      "location": "cloud-eu-west",
+      "location": "us-mia-1",
+      "hostname": "mia1-p02-g51",
+      "public_ip": "10.24.112.162",
       "health": {
         "memory_pct": 0,
         "gpu_pct": 0,
         "cpu_pct": 0,
         "alerts": [
-          "Offline for maintenance"
+          "Telemetry not yet configured"
         ]
       },
-      "default_owner": "ops",
+      "default_owner": "unassigned",
       "access": {
-        "ssh": "ssh <username>@vm-nlp-01.internal",
+        "ssh": "ssh <username>@10.24.112.162",
         "vpn_doc": "https://github.com/giovanniguastiamd/booking/wiki/VPN",
         "slurm": "N/A",
-        "notes": "Open an ops ticket before requesting reactivation."
+        "notes": "Use personal credentials only (no shared passwords)."
+      }
+    },
+    {
+      "id": "mia1-p02-g52",
+      "name": "mia1-p02-g52",
+      "kind": "server",
+      "status": "online",
+      "location": "us-mia-1",
+      "hostname": "mia1-p02-g52",
+      "public_ip": "10.24.112.163",
+      "health": {
+        "memory_pct": 0,
+        "gpu_pct": 0,
+        "cpu_pct": 0,
+        "alerts": [
+          "Telemetry not yet configured"
+        ]
+      },
+      "default_owner": "unassigned",
+      "access": {
+        "ssh": "ssh <username>@10.24.112.163",
+        "vpn_doc": "https://github.com/giovanniguastiamd/booking/wiki/VPN",
+        "slurm": "N/A",
+        "notes": "Use personal credentials only (no shared passwords)."
+      }
+    },
+    {
+      "id": "mia1-p02-g53",
+      "name": "mia1-p02-g53",
+      "kind": "server",
+      "status": "online",
+      "location": "us-mia-1",
+      "hostname": "mia1-p02-g53",
+      "public_ip": "10.24.112.164",
+      "health": {
+        "memory_pct": 0,
+        "gpu_pct": 0,
+        "cpu_pct": 0,
+        "alerts": [
+          "Telemetry not yet configured"
+        ]
+      },
+      "default_owner": "unassigned",
+      "access": {
+        "ssh": "ssh <username>@10.24.112.164",
+        "vpn_doc": "https://github.com/giovanniguastiamd/booking/wiki/VPN",
+        "slurm": "N/A",
+        "notes": "Use personal credentials only (no shared passwords)."
+      }
+    },
+    {
+      "id": "mia1-p02-g54",
+      "name": "mia1-p02-g54",
+      "kind": "server",
+      "status": "online",
+      "location": "us-mia-1",
+      "hostname": "mia1-p02-g54",
+      "public_ip": "10.24.112.165",
+      "health": {
+        "memory_pct": 0,
+        "gpu_pct": 0,
+        "cpu_pct": 0,
+        "alerts": [
+          "Telemetry not yet configured"
+        ]
+      },
+      "default_owner": "unassigned",
+      "access": {
+        "ssh": "ssh <username>@10.24.112.165",
+        "vpn_doc": "https://github.com/giovanniguastiamd/booking/wiki/VPN",
+        "slurm": "N/A",
+        "notes": "Use personal credentials only (no shared passwords)."
+      }
+    },
+    {
+      "id": "mia1-p02-g55",
+      "name": "mia1-p02-g55",
+      "kind": "server",
+      "status": "online",
+      "location": "us-mia-1",
+      "hostname": "mia1-p02-g55",
+      "public_ip": "10.24.112.166",
+      "health": {
+        "memory_pct": 0,
+        "gpu_pct": 0,
+        "cpu_pct": 0,
+        "alerts": [
+          "Telemetry not yet configured"
+        ]
+      },
+      "default_owner": "unassigned",
+      "access": {
+        "ssh": "ssh <username>@10.24.112.166",
+        "vpn_doc": "https://github.com/giovanniguastiamd/booking/wiki/VPN",
+        "slurm": "N/A",
+        "notes": "Use personal credentials only (no shared passwords)."
+      }
+    },
+    {
+      "id": "mia1-p02-g56",
+      "name": "mia1-p02-g56",
+      "kind": "server",
+      "status": "online",
+      "location": "us-mia-1",
+      "hostname": "mia1-p02-g56",
+      "public_ip": "10.24.112.174",
+      "health": {
+        "memory_pct": 0,
+        "gpu_pct": 0,
+        "cpu_pct": 0,
+        "alerts": [
+          "Telemetry not yet configured"
+        ]
+      },
+      "default_owner": "unassigned",
+      "access": {
+        "ssh": "ssh <username>@10.24.112.174",
+        "vpn_doc": "https://github.com/giovanniguastiamd/booking/wiki/VPN",
+        "slurm": "N/A",
+        "notes": "Use personal credentials only (no shared passwords)."
+      }
+    },
+    {
+      "id": "mia1-p02-g57",
+      "name": "mia1-p02-g57",
+      "kind": "server",
+      "status": "online",
+      "location": "us-mia-1",
+      "hostname": "mia1-p02-g57",
+      "public_ip": "10.24.112.175",
+      "health": {
+        "memory_pct": 0,
+        "gpu_pct": 0,
+        "cpu_pct": 0,
+        "alerts": [
+          "Telemetry not yet configured"
+        ]
+      },
+      "default_owner": "unassigned",
+      "access": {
+        "ssh": "ssh <username>@10.24.112.175",
+        "vpn_doc": "https://github.com/giovanniguastiamd/booking/wiki/VPN",
+        "slurm": "N/A",
+        "notes": "Use personal credentials only (no shared passwords)."
       }
     }
   ]

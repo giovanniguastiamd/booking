@@ -75,6 +75,8 @@ function renderResourceCard(resource, currentReservation) {
     </div>
     <span class="badge ${uiStatus}">${uiStatus.toUpperCase()}</span>
     <div class="meta">Type: ${resource.kind} | Location: ${resource.location}</div>
+    <div class="meta">Hostname: <code>${resource.hostname || "-"}</code></div>
+    <div class="meta">Public IP: <code>${resource.public_ip || "-"}</code></div>
     <div>Current owner: <strong>${owner}</strong></div>
     <div>Occupied until: <strong>${until}</strong></div>
     <div>CPU ${resource.health.cpu_pct}% | RAM ${resource.health.memory_pct}% | GPU ${resource.health.gpu_pct}%</div>
