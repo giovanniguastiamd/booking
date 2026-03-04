@@ -109,14 +109,23 @@ td {
   display: inline-block;
   padding: 0.65rem 0.95rem;
   border-radius: 10px;
-  border: 1px solid transparent;
+  border: 1px solid var(--line);
   text-decoration: none;
   font-weight: 600;
+  color: var(--ink);
+  background: #fff;
 }
 
 .primary {
   background: var(--accent);
   color: #fff;
+  border-color: var(--accent);
+}
+
+.secondary {
+  background: #fff;
+  color: var(--accent);
+  border-color: #9fb8f5;
 }
 
 .muted {

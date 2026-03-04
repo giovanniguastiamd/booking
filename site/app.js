@@ -20,12 +20,40 @@ function detectGitHost() {
   return "https://github.com";
 }
 
-function issueCreateUrl(gitHost, repoSlug) {
+function issueCreateUrl(gitHost, repoSlug, prefill = {}) {
   if (!repoSlug) return "#";
   const params = new URLSearchParams({
-    template: "booking.md",
     labels: "booking,status:pending"
   });
+
+  if (prefill.resourceId) {
+    params.set("title", `[BOOKING] ${prefill.resourceId} <start-end>`);
+    params.set(
+      "body",
+      [
+        "### Resource ID",
+        prefill.resourceId,
+        "",
+        "### Start (UTC)",
+        "YYYY-MM-DDTHH:MM:SSZ",
+        "",
+        "### End (UTC)",
+        "YYYY-MM-DDTHH:MM:SSZ",
+        "",
+        "### Reason",
+        "Describe the technical reason.",
+        "",
+        "### Contact",
+        "@username",
+        "",
+        "### Security policy",
+        "- [x] I will not include credentials or secrets in this issue."
+      ].join("\n")
+    );
+  } else {
+    params.set("template", "booking.md");
+  }
+
   return `${gitHost}/${repoSlug}/issues/new?${params.toString()}`;
 }
 
@@ -52,7 +80,7 @@ function currentReservationFor(resourceId, reservations, now) {
   });
 }
 
-function renderResourceCard(resource, currentReservation) {
+function renderResourceCard(resource, currentReservation, bookUrl) {
   const box = document.createElement("article");
   box.className = "card";
 
@@ -85,6 +113,7 @@ function renderResourceCard(resource, currentReservation) {
     <div class="meta">VPN: <a href="${resource.access.vpn_doc}" target="_blank" rel="noreferrer">documentation</a></div>
     <div class="meta">Slurm: <code>${resource.access.slurm}</code></div>
     <div class="meta">${resource.access.notes}</div>
+    <div><a class="button secondary" href="${bookUrl}" target="_blank" rel="noreferrer">Book This Machine</a></div>
   `;
 
   return box;
@@ -134,13 +163,16 @@ async function loadDashboard() {
   const resources = resourcesData.resources || [];
   const reservations = (reservationsData.reservations || []).filter((x) => DISPLAY_STATUSES.has(x.status));
   const now = new Date();
+  const repoSlug = detectRepoSlug();
+  const gitHost = detectGitHost();
 
   const list = document.getElementById("resource-list");
   list.innerHTML = "";
 
   resources.forEach((resource) => {
     const current = currentReservationFor(resource.id, reservations, now);
-    list.appendChild(renderResourceCard(resource, current));
+    const resourceBookUrl = issueCreateUrl(gitHost, repoSlug, { resourceId: resource.id });
+    list.appendChild(renderResourceCard(resource, current, resourceBookUrl));
   });
 
   const sortedReservations = [...reservations].sort((a, b) => {
@@ -154,7 +186,7 @@ async function loadDashboard() {
   document.getElementById("last-updated").textContent = `Data updated: ${formatUtc(updated)}`;
 
   const link = document.getElementById("new-booking-link");
-  link.href = issueCreateUrl(detectGitHost(), detectRepoSlug());
+  link.href = issueCreateUrl(gitHost, repoSlug);
 }
 
 loadDashboard().catch((error) => {
