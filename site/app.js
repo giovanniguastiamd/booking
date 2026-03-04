@@ -72,14 +72,27 @@ function issueCreateUrl(gitHost, repoSlug, prefill = {}) {
   const endUtc = prefill.endUtc || toUtcNoSeconds(addHours(parseDate(startUtc) || new Date(), 24));
   const resourceId = prefill.resourceId || "<resource-id>";
 
+  const body = [
+    "Resource ID",
+    resourceId,
+    "",
+    "Start (UTC)",
+    startUtc,
+    "",
+    "End (UTC)",
+    endUtc,
+    "",
+    "Reason",
+    "Briefly describe what you need to run.",
+    "",
+    "Contact",
+    "@username"
+  ].join("\n");
+
   const params = new URLSearchParams({
-    template: "booking.yml",
-    title: `Booking ${resourceId}`,
-    resource: resourceId,
-    start_utc: startUtc,
-    end_utc: endUtc,
-    reason: "Briefly describe what you need to run.",
-    contact: "@username"
+    labels: "booking,status:pending",
+    title: `[BOOKING] ${resourceId} <start-end>`,
+    body
   });
 
   return `${gitHost}/${repoSlug}/issues/new?${params.toString()}`;
