@@ -1,0 +1,133 @@
+name: Booking triage
+
+on:
+  issues:
+    types: [opened, edited, reopened]
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  validate-booking:
+    if: contains(join(github.event.issue.labels.*.name, ','), 'booking')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate and label booking issue
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const issue = context.payload.issue;
+            const marker = "<!-- booking-bot -->";
+            const STATUS_LABELS = new Set(["status:pending", "status:approved", "status:denied", "status:active", "status:done"]);
+            const BUSY_STATUS_LABELS = new Set(["status:pending", "status:approved", "status:active"]);
+
+            const escapeRegex = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+            const extractField = (body, title) => {
+              const regex = new RegExp(`###\\s*${escapeRegex(title)}\\s*\\n([\\s\\S]*?)(?=\\n###\\s|$)`, "i");
+              const match = body.match(regex);
+              return (match?.[1] || "").trim();
+            };
+
+            const parseTime = (value) => {
+              const date = new Date(value);
+              if (Number.isNaN(date.getTime())) return null;
+              return date;
+            };
+
+            const overlaps = (aStart, aEnd, bStart, bEnd) => aStart < bEnd && bStart < aEnd;
+            const issueLabels = issue.labels.map((label) => label.name || label);
+
+            const resourceFromLabel = issueLabels.find((name) => name.startsWith("resource:"))?.slice("resource:".length);
+            const body = issue.body || "";
+            const resource = extractField(body, "Resource ID") || resourceFromLabel || "";
+            const startRaw = extractField(body, "Start (UTC)");
+            const endRaw = extractField(body, "End (UTC)");
+            const contact = extractField(body, "Contact");
+
+            const start = parseTime(startRaw);
+            const end = parseTime(endRaw);
+
+            const updateBotComment = async (message) => {
+              const { owner, repo } = context.repo;
+              const comments = await github.paginate(github.rest.issues.listComments, {
+                owner,
+                repo,
+                issue_number: issue.number,
+                per_page: 100
+              });
+              const body = `${marker}\n${message}`;
+              const existing = comments.find((c) => c.user?.type === "Bot" && c.body?.includes(marker));
+              if (existing) {
+                await github.rest.issues.updateComment({ owner, repo, comment_id: existing.id, body });
+              } else {
+                await github.rest.issues.createComment({ owner, repo, issue_number: issue.number, body });
+              }
+            };
+
+            const setStatusAndResourceLabels = async (statusLabel, normalizedResource) => {
+              const { owner, repo } = context.repo;
+              const cleanLabels = issueLabels.filter((name) => !name.startsWith("status:") && !name.startsWith("resource:"));
+              const next = new Set([...cleanLabels, "booking", statusLabel]);
+              if (normalizedResource) next.add(`resource:${normalizedResource}`);
+              await github.rest.issues.setLabels({
+                owner,
+                repo,
+                issue_number: issue.number,
+                labels: [...next]
+              });
+            };
+
+            if (!resource || !start || !end || !(start < end) || !contact) {
+              await setStatusAndResourceLabels("status:denied", resource || "unknown");
+              await updateBotComment(
+                "Prenotazione rifiutata automaticamente: campi mancanti o invalidi. " +
+                "Servono `Resource ID`, `Start (UTC)`, `End (UTC)` con inizio < fine, e `Contact`."
+              );
+              return;
+            }
+
+            const { owner, repo } = context.repo;
+            const openBookings = await github.paginate(github.rest.issues.listForRepo, {
+              owner,
+              repo,
+              state: "open",
+              labels: "booking",
+              per_page: 100
+            });
+
+            const blockers = [];
+            for (const candidate of openBookings) {
+              if (candidate.number === issue.number) continue;
+
+              const labels = candidate.labels.map((label) => label.name || label);
+              if (!labels.some((name) => BUSY_STATUS_LABELS.has(name))) continue;
+
+              const candidateResourceFromLabel =
+                labels.find((name) => name.startsWith("resource:"))?.slice("resource:".length) || "";
+              const candidateBody = candidate.body || "";
+              const candidateResource = extractField(candidateBody, "Resource ID") || candidateResourceFromLabel;
+              if (candidateResource !== resource) continue;
+
+              const candidateStart = parseTime(extractField(candidateBody, "Start (UTC)"));
+              const candidateEnd = parseTime(extractField(candidateBody, "End (UTC)"));
+              if (!candidateStart || !candidateEnd || !(candidateStart < candidateEnd)) continue;
+
+              if (overlaps(start, end, candidateStart, candidateEnd)) {
+                blockers.push(candidate.number);
+              }
+            }
+
+            if (blockers.length) {
+              await setStatusAndResourceLabels("status:denied", resource);
+              await updateBotComment(
+                `Conflitto rilevato su \`${resource}\` con issue: ${blockers.map((n) => `#${n}`).join(", ")}. ` +
+                "La richiesta e stata marcata `status:denied`."
+              );
+              return;
+            }
+
+            await setStatusAndResourceLabels("status:approved", resource);
+            await updateBotComment(
+              `Prenotazione approvata per \`${resource}\` da ${start.toISOString()} a ${end.toISOString()} (UTC).`
+            );

@@ -1,0 +1,141 @@
+:root {
+  --bg: #f5f7fb;
+  --ink: #0f1a2b;
+  --panel: #ffffff;
+  --line: #d4dcec;
+  --accent: #0052cc;
+  --ok: #16794b;
+  --warn: #9a6200;
+  --bad: #9d1025;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: "Segoe UI", Tahoma, sans-serif;
+  background: linear-gradient(180deg, #eef3ff 0%, var(--bg) 100%);
+  color: var(--ink);
+}
+
+.hero {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: flex-start;
+  padding: 1.5rem;
+  border-bottom: 1px solid var(--line);
+  background: var(--panel);
+}
+
+h1,
+h2 {
+  margin: 0 0 0.5rem;
+}
+
+p {
+  margin: 0;
+}
+
+main {
+  padding: 1.5rem;
+  display: grid;
+  gap: 1.5rem;
+}
+
+.grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+}
+
+.card {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 1rem;
+  display: grid;
+  gap: 0.5rem;
+}
+
+.meta {
+  font-size: 0.9rem;
+  color: #4b5e7d;
+}
+
+.badge {
+  display: inline-block;
+  border-radius: 999px;
+  padding: 0.2rem 0.6rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.badge.free {
+  background: #d7f4e4;
+  color: var(--ok);
+}
+
+.badge.occupied {
+  background: #fff2d8;
+  color: var(--warn);
+}
+
+.badge.offline {
+  background: #ffdfe3;
+  color: var(--bad);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+th,
+td {
+  padding: 0.7rem;
+  text-align: left;
+  border-bottom: 1px solid var(--line);
+  font-size: 0.95rem;
+}
+
+.button {
+  display: inline-block;
+  padding: 0.65rem 0.95rem;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.primary {
+  background: var(--accent);
+  color: #fff;
+}
+
+.muted {
+  color: #5d6f8f;
+  font-size: 0.9rem;
+}
+
+ul {
+  margin: 0.2rem 0 0;
+  padding-left: 1rem;
+}
+
+footer {
+  padding: 0 1.5rem 1.5rem;
+}
+
+@media (max-width: 700px) {
+  .hero {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}

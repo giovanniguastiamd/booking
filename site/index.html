@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="it">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Team Compute Booking</title>
+    <link rel="stylesheet" href="./styles.css">
+  </head>
+  <body data-repo="giovanniguastiamd/booking">
+    <header class="hero">
+      <div>
+        <h1>Team Compute Booking</h1>
+        <p>Stato risorse, prenotazioni e istruzioni di accesso in un unico punto.</p>
+      </div>
+      <a class="button primary" id="new-booking-link" href="#" target="_blank" rel="noreferrer">Prenota risorsa</a>
+    </header>
+
+    <main>
+      <section>
+        <h2>Risorse</h2>
+        <div id="resource-list" class="grid"></div>
+      </section>
+
+      <section>
+        <h2>Prenotazioni</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Risorsa</th>
+              <th>Owner</th>
+              <th>Inizio (UTC)</th>
+              <th>Fine (UTC)</th>
+              <th>Stato</th>
+              <th>Issue</th>
+            </tr>
+          </thead>
+          <tbody id="reservation-table-body"></tbody>
+        </table>
+      </section>
+    </main>
+
+    <footer>
+      <p id="last-updated">Aggiornamento dati: -</p>
+    </footer>
+
+    <script src="./app.js"></script>
+  </body>
+</html>

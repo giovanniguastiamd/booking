@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Access support
+    url: https://github.com/giovanniguastiamd/booking/wiki/Access-Guide
+    about: Guide VPN/SSH/Slurm e policy di accesso

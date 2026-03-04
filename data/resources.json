@@ -1,0 +1,69 @@
+{
+  "generated_at": "2026-03-04T00:00:00Z",
+  "resources": [
+    {
+      "id": "server-a",
+      "name": "Server A100 01",
+      "kind": "server",
+      "status": "online",
+      "location": "dc-milano",
+      "health": {
+        "memory_pct": 42,
+        "gpu_pct": 33,
+        "cpu_pct": 18,
+        "alerts": []
+      },
+      "default_owner": "ml-platform",
+      "access": {
+        "ssh": "ssh <username>@server-a.internal",
+        "vpn_doc": "https://github.com/giovanniguastiamd/booking/wiki/VPN",
+        "slurm": "N/A",
+        "notes": "Usa solo credenziali personali (no password condivise)."
+      }
+    },
+    {
+      "id": "cluster-x",
+      "name": "Cluster X",
+      "kind": "cluster",
+      "status": "online",
+      "location": "dc-roma",
+      "health": {
+        "memory_pct": 79,
+        "gpu_pct": 66,
+        "cpu_pct": 74,
+        "alerts": [
+          "Memoria sopra soglia 75%"
+        ]
+      },
+      "default_owner": "hpc-team",
+      "access": {
+        "ssh": "ssh <username>@login.cluster-x.internal",
+        "vpn_doc": "https://github.com/giovanniguastiamd/booking/wiki/VPN",
+        "slurm": "sbatch --partition=gpu --gres=gpu:1 job.sbatch",
+        "notes": "Connettersi al nodo login; no accesso diretto ai compute node."
+      }
+    },
+    {
+      "id": "vm-nlp-01",
+      "name": "VM NLP 01",
+      "kind": "vm",
+      "status": "offline",
+      "location": "cloud-eu-west",
+      "health": {
+        "memory_pct": 0,
+        "gpu_pct": 0,
+        "cpu_pct": 0,
+        "alerts": [
+          "Offline per manutenzione"
+        ]
+      },
+      "default_owner": "ops",
+      "access": {
+        "ssh": "ssh <username>@vm-nlp-01.internal",
+        "vpn_doc": "https://github.com/giovanniguastiamd/booking/wiki/VPN",
+        "slurm": "N/A",
+        "notes": "Aprire ticket ops prima di richiedere la riattivazione."
+      }
+    }
+  ]
+}

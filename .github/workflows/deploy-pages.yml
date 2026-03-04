@@ -1,0 +1,110 @@
+name: Deploy booking dashboard
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+  issues:
+    types: [opened, edited, reopened, closed, labeled, unlabeled]
+
+permissions:
+  contents: read
+  issues: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Prepare dist
+        run: |
+          mkdir -p dist/data
+          cp -R site/* dist/
+          cp data/resources.json dist/data/resources.json
+
+      - name: Generate reservations.json from Issues
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require("fs");
+            const path = require("path");
+
+            const { owner, repo } = context.repo;
+            const allIssues = await github.paginate(github.rest.issues.listForRepo, {
+              owner,
+              repo,
+              state: "all",
+              labels: "booking",
+              per_page: 100
+            });
+
+            const escapeRegex = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+            const extractField = (body, title) => {
+              const regex = new RegExp(`###\\s*${escapeRegex(title)}\\s*\\n([\\s\\S]*?)(?=\\n###\\s|$)`, "i");
+              const match = (body || "").match(regex);
+              return (match?.[1] || "").trim();
+            };
+
+            const statusPriority = ["status:active", "status:approved", "status:pending", "status:denied", "status:done"];
+            const pickStatus = (labels) => statusPriority.find((status) => labels.includes(status)) || "status:pending";
+
+            const reservations = allIssues
+              .filter((issue) => !issue.pull_request)
+              .map((issue) => {
+                const labels = issue.labels.map((label) => label.name || label);
+                const resourceFromLabel = labels.find((name) => name.startsWith("resource:"))?.slice("resource:".length) || "";
+                return {
+                  issue_number: issue.number,
+                  issue_url: issue.html_url,
+                  title: issue.title,
+                  resource_id: extractField(issue.body || "", "Resource ID") || resourceFromLabel || null,
+                  start_utc: extractField(issue.body || "", "Start (UTC)") || null,
+                  end_utc: extractField(issue.body || "", "End (UTC)") || null,
+                  reason: extractField(issue.body || "", "Reason") || null,
+                  owner: extractField(issue.body || "", "Contact") || issue.user?.login || null,
+                  status: pickStatus(labels),
+                  created_at: issue.created_at,
+                  updated_at: issue.updated_at
+                };
+              })
+              .sort((a, b) => {
+                const d1 = Date.parse(a.start_utc || "");
+                const d2 = Date.parse(b.start_utc || "");
+                return (Number.isNaN(d1) ? 0 : d1) - (Number.isNaN(d2) ? 0 : d2);
+              });
+
+            const payload = {
+              generated_at: new Date().toISOString(),
+              reservations
+            };
+
+            const outputPath = path.join(process.env.GITHUB_WORKSPACE, "dist", "data", "reservations.json");
+            fs.mkdirSync(path.dirname(outputPath), { recursive: true });
+            fs.writeFileSync(outputPath, JSON.stringify(payload, null, 2));
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
