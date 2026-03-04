@@ -225,9 +225,11 @@ function renderReservations(rows) {
 }
 
 async function loadDashboard() {
+  // Avoid stale browser/CDN cache for frequently updated JSON payloads.
+  const cacheBuster = Date.now();
   const [resourcesRes, reservationsRes] = await Promise.all([
-    fetch("./data/resources.json"),
-    fetch("./data/reservations.json")
+    fetch(`./data/resources.json?v=${cacheBuster}`, { cache: "no-store" }),
+    fetch(`./data/reservations.json?v=${cacheBuster}`, { cache: "no-store" })
   ]);
 
   if (!resourcesRes.ok || !reservationsRes.ok) {
