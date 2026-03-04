@@ -192,6 +192,246 @@
         "slurm": "N/A",
         "notes": "Use personal credentials only (no shared passwords)."
       }
+    },
+    {
+      "id": "tw022",
+      "name": "tw022",
+      "kind": "server",
+      "status": "online",
+      "location": "unknown",
+      "hostname": "64.139.222.222",
+      "public_ip": "64.139.222.222",
+      "health": {
+        "memory_pct": 0,
+        "gpu_pct": 0,
+        "cpu_pct": 0,
+        "alerts": [
+          "Telemetry not yet configured"
+        ]
+      },
+      "default_owner": "unassigned",
+      "access": {
+        "ssh": "ssh amd@64.139.222.222",
+        "vpn_doc": "https://github.com/giovanniguastiamd/booking/wiki/VPN",
+        "slurm": "N/A",
+        "notes": "Use personal credentials only (no shared passwords)."
+      }
+    },
+    {
+      "id": "tw015",
+      "name": "tw015",
+      "kind": "server",
+      "status": "online",
+      "location": "unknown",
+      "hostname": "64.139.222.215",
+      "public_ip": "64.139.222.215",
+      "health": {
+        "memory_pct": 0,
+        "gpu_pct": 0,
+        "cpu_pct": 0,
+        "alerts": [
+          "Telemetry not yet configured"
+        ]
+      },
+      "default_owner": "unassigned",
+      "access": {
+        "ssh": "ssh amd@64.139.222.215",
+        "vpn_doc": "https://github.com/giovanniguastiamd/booking/wiki/VPN",
+        "slurm": "N/A",
+        "notes": "Use personal credentials only (no shared passwords)."
+      }
+    },
+    {
+      "id": "tw013",
+      "name": "tw013",
+      "kind": "server",
+      "status": "offline",
+      "location": "unknown",
+      "hostname": "64.139.222.213",
+      "public_ip": "64.139.222.213",
+      "health": {
+        "memory_pct": 0,
+        "gpu_pct": 0,
+        "cpu_pct": 0,
+        "alerts": [
+          "Host reported as possibly broken"
+        ]
+      },
+      "default_owner": "unassigned",
+      "access": {
+        "ssh": "ssh amd@64.139.222.213",
+        "vpn_doc": "https://github.com/giovanniguastiamd/booking/wiki/VPN",
+        "slurm": "N/A",
+        "notes": "Machine flagged as possibly broken."
+      }
+    },
+    {
+      "id": "tw010",
+      "name": "tw010",
+      "kind": "server",
+      "status": "online",
+      "location": "unknown",
+      "hostname": "64.139.222.210",
+      "public_ip": "64.139.222.210",
+      "health": {
+        "memory_pct": 0,
+        "gpu_pct": 0,
+        "cpu_pct": 0,
+        "alerts": [
+          "Telemetry not yet configured"
+        ]
+      },
+      "default_owner": "unassigned",
+      "access": {
+        "ssh": "ssh amd@64.139.222.210",
+        "vpn_doc": "https://github.com/giovanniguastiamd/booking/wiki/VPN",
+        "slurm": "N/A",
+        "notes": "Use personal credentials only (no shared passwords)."
+      }
+    },
+    {
+      "id": "tw039",
+      "name": "tw039",
+      "kind": "server",
+      "status": "online",
+      "location": "unknown",
+      "hostname": "64.139.222.239",
+      "public_ip": "64.139.222.239",
+      "health": {
+        "memory_pct": 0,
+        "gpu_pct": 0,
+        "cpu_pct": 0,
+        "alerts": [
+          "Telemetry not yet configured"
+        ]
+      },
+      "default_owner": "unassigned",
+      "access": {
+        "ssh": "ssh amd@64.139.222.239",
+        "vpn_doc": "https://github.com/giovanniguastiamd/booking/wiki/VPN",
+        "slurm": "N/A",
+        "notes": "Use personal credentials only (no shared passwords)."
+      }
+    },
+    {
+      "id": "tw004",
+      "name": "tw004",
+      "kind": "server",
+      "status": "online",
+      "location": "unknown",
+      "hostname": "64.139.222.204",
+      "public_ip": "64.139.222.204",
+      "health": {
+        "memory_pct": 0,
+        "gpu_pct": 0,
+        "cpu_pct": 0,
+        "alerts": [
+          "Telemetry not yet configured"
+        ]
+      },
+      "default_owner": "unassigned",
+      "access": {
+        "ssh": "ssh amd@64.139.222.204",
+        "vpn_doc": "https://github.com/giovanniguastiamd/booking/wiki/VPN",
+        "slurm": "N/A",
+        "notes": "Use personal credentials only (no shared passwords)."
+      }
+    },
+    {
+      "id": "tw023",
+      "name": "tw023",
+      "kind": "server",
+      "status": "online",
+      "location": "unknown",
+      "hostname": "64.139.222.223",
+      "public_ip": "64.139.222.223",
+      "health": {
+        "memory_pct": 0,
+        "gpu_pct": 0,
+        "cpu_pct": 0,
+        "alerts": [
+          "Telemetry not yet configured"
+        ]
+      },
+      "default_owner": "unassigned",
+      "access": {
+        "ssh": "ssh amd@64.139.222.223",
+        "vpn_doc": "https://github.com/giovanniguastiamd/booking/wiki/VPN",
+        "slurm": "N/A",
+        "notes": "Use personal credentials only (no shared passwords)."
+      }
+    },
+    {
+      "id": "tw033",
+      "name": "tw033",
+      "kind": "server",
+      "status": "online",
+      "location": "unknown",
+      "hostname": "64.139.222.233",
+      "public_ip": "64.139.222.233",
+      "health": {
+        "memory_pct": 0,
+        "gpu_pct": 0,
+        "cpu_pct": 0,
+        "alerts": [
+          "Telemetry not yet configured"
+        ]
+      },
+      "default_owner": "unassigned",
+      "access": {
+        "ssh": "ssh amd@64.139.222.233",
+        "vpn_doc": "https://github.com/giovanniguastiamd/booking/wiki/VPN",
+        "slurm": "N/A",
+        "notes": "Use personal credentials only (no shared passwords)."
+      }
+    },
+    {
+      "id": "tw020",
+      "name": "tw020",
+      "kind": "server",
+      "status": "online",
+      "location": "unknown",
+      "hostname": "64.139.222.220",
+      "public_ip": "64.139.222.220",
+      "health": {
+        "memory_pct": 0,
+        "gpu_pct": 0,
+        "cpu_pct": 0,
+        "alerts": [
+          "Telemetry not yet configured"
+        ]
+      },
+      "default_owner": "unassigned",
+      "access": {
+        "ssh": "ssh amd@64.139.222.220",
+        "vpn_doc": "https://github.com/giovanniguastiamd/booking/wiki/VPN",
+        "slurm": "N/A",
+        "notes": "Use personal credentials only (no shared passwords)."
+      }
+    },
+    {
+      "id": "tw043",
+      "name": "tw043",
+      "kind": "server",
+      "status": "online",
+      "location": "unknown",
+      "hostname": "64.139.222.243",
+      "public_ip": "64.139.222.243",
+      "health": {
+        "memory_pct": 0,
+        "gpu_pct": 0,
+        "cpu_pct": 0,
+        "alerts": [
+          "Telemetry not yet configured"
+        ]
+      },
+      "default_owner": "unassigned",
+      "access": {
+        "ssh": "ssh amd@64.139.222.243",
+        "vpn_doc": "https://github.com/giovanniguastiamd/booking/wiki/VPN",
+        "slurm": "N/A",
+        "notes": "Use personal credentials only (no shared passwords)."
+      }
     }
   ]
 }

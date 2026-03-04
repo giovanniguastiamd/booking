@@ -19,24 +19,6 @@ This repository provides a lightweight system to:
   - `.github/workflows/free-machine.yml`: processes early release requests and tracks who released
   - `.github/workflows/deploy-pages.yml`: regenerates `reservations.json` and deploys Pages
 
-## Quick Setup
-
-1. Create these labels in the repo:
-   - `booking`
-   - `release`
-   - `status:pending`
-   - `status:approved`
-   - `status:denied`
-   - `status:active`
-   - `status:done`
-   - `resource:server-a`, `resource:cluster-x`, etc.
-2. Update `data/resources.json` with your real resources.
-3. In `site/index.html`, set `data-repo="owner/repo"` on `body` (example: `giovanniguastiamd/booking`).
-4. Enable GitHub Pages:
-   - `Settings -> Pages -> Build and deployment -> Source: GitHub Actions`
-5. Check `GITHUB_TOKEN` permissions (defaults usually work unless restricted by org policy):
-   - triage workflow: `issues: write`, `contents: read`
-   - pages workflow: `issues: read`, `pages: write`, `id-token: write`
 
 ## Operating Flow
 
